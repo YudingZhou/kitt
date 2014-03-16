@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: KITT is TTCN tool
+Bundle-SymbolicName: org.quantumlabs.kitt;singleton:=true
+Bundle-Version: 1.0.0.alpha
+Bundle-Activator: org.quantumlabs.kitt.Activator
+Require-Bundle: org.eclipse.e4.ui.workbench;bundle-version="1.0.1",
+ org.eclipse.core.runtime;bundle-version="[3.9.0,4.3.0]",
+ org.eclipse.ui;bundle-version="3.105.0",
+ org.eclipse.core.resources;bundle-version="3.8.101",
+ org.eclipse.ui.navigator;bundle-version="3.5.101",
+ org.eclipse.ui.navigator.resources;bundle-version="3.4.500",
+ org.eclipse.ui.ide;bundle-version="3.7.0",
+ org.eclipse.jface.text;bundle-version="[3.8.101,4.3.0]",
+ org.eclipse.jface;bundle-version="3.9.1",
+ org.eclipse.ui.views;bundle-version="3.6.100",
+ org.eclipse.ui.editors;bundle-version="3.8.0",
+ org.eclipse.core.filesystem;bundle-version="1.4.0",
+ org.junit;bundle-version="4.11.0",
+ org.eclipse.core.filebuffers;bundle-version="3.5.300"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: lib/antlr-4.2-complete.jar,
+ .
+Bundle-Vendor: org.quantumlabs

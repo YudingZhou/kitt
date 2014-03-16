@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+
+<!-- navigator view-->
+<!--<extension
+         point="org.eclipse.ui.views">
+      <category
+            id="org.quantumlabs.kitt.view"
+            name="KITT view">
+      </category>
+      <view
+            category="org.quantumlabs.kitt.view"
+            class="org.quantumlabs.kitt.ui.view.KittProjectNavigatorView"
+            icon="icons/calendar-icon_32x32px.png"
+            id="org.quantumlabs.kitt.KittProjectNavigatorView"
+            name="TTCN Navigator">
+      </view>
+      </extension>-->
+<!-- kitt project nature -->
+<!--<extension
+      point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run class="org.quantumlabs.kitt.build.KittNature">
+         </run>
+      </runtime>
+</extension> -->
+
+<!-- kitt project nature image-->
+ <!-- new TTCN wizard-->
+<extension
+      point="org.eclipse.ui.newWizards">
+   <category
+         id="org.quantumlabs.kitt"
+         name="TTCN">
+   </category>
+   <wizard
+         category="org.quantumlabs.kitt"
+         class="org.quantumlabs.kitt.ui.wizards.NewTTCNFileWizard"
+         icon="icons/ttcn-file-icon-16x16px.png"
+         id="org.quantumlabs.kitt.wizards.NewTTCNFileWizard"
+         name="New TTCN module">
+   </wizard>
+</extension>
+
+<!-- TTCN Editor-->
+<extension
+      point="org.eclipse.ui.editors">
+   <editor
+         class="org.quantumlabs.kitt.ui.editors.TTCNEditor"
+         contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+         default="true"
+         extensions="ttcn"
+         icon="icons/ttcn-file-icon-16x16px.png"
+         id="org.quantumlabs.kitt.editors.TTCNEditor"
+         name="TTCN editor">
+           <contentTypeBinding
+               contentTypeId="org.quantumlabs.kitt.editor.ttcnsource"
+            /> 
+   </editor>
+</extension>
+<!-- TTCN Editor document provider-->
+<extension
+      point="org.eclipse.ui.editors.documentProviders">
+   <provider
+         class="org.quantumlabs.kitt.ui.editors.TTCNFileDocumentProvider"
+         id="org.quantumlabs.kitt.editors.TTCNFileDocumentProvider"
+         inputTypes="org.eclipse.ui.IStorageEditorInput">
+   </provider>
+</extension>
+<!-- TTCN Editor document setup participant-->
+<extension
+      point="org.eclipse.core.filebuffers.documentSetup">
+   <participant
+         class="org.quantumlabs.kitt.ui.editors.TTCNDocumentSetupParticipant"
+         extensions="ttcn"
+         fileNames="*.ttcn"
+         contentTypeId="org.quantumlabs.kitt.editor.ttcnsource">
+   </participant>
+</extension>
+<!-- TTCN content type -->
+<extension
+      point="org.eclipse.core.contenttype.contentTypes">
+<content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="ttcn"
+            file-names="*.ttcn"
+            id="org.quantumlabs.kitt.editor.ttcnsource"
+            name="TTCN content type"/>
+            </extension>
+            
+<!-- TTCN Annotation model creation-->
+<extension
+      point="org.eclipse.core.filebuffers.annotationModelCreation">
+   <factory
+         class="org.quantumlabs.kitt.ui.editors.TTCNFileDocumentProvider"
+         contentTypeId="org.quantumlabs.kitt.editor.ttcnsource"
+         extensions="ttcn"
+         fileNames="*.ttcn">
+   </factory>
+</extension>
+
+<!-- TTCN editor preference store-->
+
+
+<extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            name="KITT"
+            class="org.quantumlabs.kitt.ui.preference.TTCNBasePreferencePage"
+            id="org.quantumlabs.kitt.ui.preference.TTCNBasePreferencePage">
+      </page>
+   </extension>
+   <!-- markers -->
+
+ <!-- Theme-->
+ 
+</plugin>

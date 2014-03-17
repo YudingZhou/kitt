@@ -4,6 +4,8 @@ grammar Tes;
 @header{
 package org.quantumlabs.kitt.core.parse;
 }
+
+
 WS
 	:[ \n\r\t]+ -> skip
 	;
@@ -344,151 +346,7 @@ PRIMITIVE_TYPE_LITERAL
 	|'hexstring'
 	|'octetstring'
 	|'bitstring'
-	;
-/*KW_LITERAL
-	:
-	('action'
-	|'address'
-	|'all'
-	|'aLESS_THAN'
-	|'fail'
-	|'for'
-	|'from'
-	|'noblock'
-	|'not'
-	|'no 4b'
-	|'no'
-	|'self'
-	|'set'
-	|'activate'
-	|'aLESS_THANstep'
-	|'and'
-	|'and4b'
-	|'any'
-	|'anytype'
-	|'bitstring'
-	|'boolean'
-	|'call'
-	|'catch'
-	|'char'
-	|'charstring'
-	|'check'
-	|'clear'
-	|'complement'
-	|'component'
-	|'connect'
-	|'const'
-	|'control'
-	|'create'
-	|'deactivate'
-	|'defauLESS_THAN'
-	|'disconnect'
-	|'display'
-	|'do'
-	|'done'
-	|'else'
-	|'encode'
-	|'enumerated'
-	|'error'
-	|'except'
-	|'exception'
-	|'execute'
-	|'extension'
-	|'external'
-	|'fail'
-	|'false'
-	|'float'
-	|'function '
-	|'getverdict'
-	|'getcall'
-	|'getreply'
-	|'goto'
-	|'group'
-	|'hexstring'
-	|'if'
-	|'ifpresent'
-	|'import'
-	|'in'
-	|'inconc'
-	|'infinity'
-	|'inout'
-	|'integer'
-	|'interleave'
-	|'label'
-	|'language'
-	|'lenMORE_THANh'
-	|'log'
-	|'map'
-	|'match'
-	|'message'
-	|'mixed'
-	|'mod'
-	|'modifies'
-	|'module'
-	|'mtc'
-	|'none'
-	|'t'
-	|'wait'
-	|'null'
-	|'objid'
-	|'octetstring'
-	|'of'
-	|'omit'
-	|'on'
-	|'optional'
-	|'or'
-	|'or4b'
-	|'out'
-	|'override'
-	|'param'
-	|'Modulepar'
-	|'pass'
-	|'pattern'
-	|'port'
-	|'procedure'
-	|'raise'
-	|'read'
-	|'receive'
-	|'record'
-	|'recursive '
-	|'rem'
-	|'repeat'
-	|'reply'
-	|'return '
-	|'running'
-	|'runs'
-	|'send'
-	|'sender'
-	|'setverdict'
-	|'signature'
-	|'start'
-	|'stop'
-	|'subset'
-	|'superset'
-	|'system '
-	|'template'
-	|'testcase'
-	|'timeout'
-	|'timer'
-	|'to'
-	|'trigger'
-	|'true'
-	|'type'
-	|'union'
-	|'universal'
-	|'unmap'
-	|'value'
-	|'valueof'
-	|'var'
-	|'variant'
-	|'verdicttype'
-	|'while'
-	|'with'
-	|'xor'
-	|'xor4b' 
-	)
-	;
-*/	
+	;	
 ID 
 	:LETER_LITERAL+ 
 		(LETER_LITERAL
@@ -749,21 +607,60 @@ altStat
 testCaseDef
 	: 'testcase' ID PARENTHESE_L PARENTHESE_R 'runs' 'on' ID 'system' ID BRACE_L state+ BRACE_R/*TODO*/
 	;
-importDef
-	: 'import' 'from' ID ('language' CHARSTRING_LITERAL)?
-		( 'all' 
-		|BRACE_L 
-			(
-				('type'
-				|'function'
-				|'template'
-				|'modulepar'
-				|'const'
-				) ID ( ',' ID)* STATEND
-			)* ( 'type' | 'function' | 'template' | 'modulepar' | 'const') ID ( ',' ID)* STATEND?
-		BRACE_R
-		) /*TODO, missing something which can be imported?*/
+	
+/*******************************************************************
+		@START : "import definition"
+		@See : John.Wiley's "An introduction to TTCN3" chapter7.3
+********************************************************************/
+importableType
+	:'testcase'
+	|'function'
+	|'altstep'
+	|'template'
+	|'type'
+	|'signature'
+	|'const'
+	|'modulepar' 
 	;
+importByKindDef
+	:importableType 'all' ( 'except' ID ( ',' ID)+ )?
+	;
+importByNameDef
+	:importableType ID ( ',' ID )+
+	;
+importGroupDef
+	:'group' ID ( DOT ID)+
+	|'group' 'all' ( 'except' ID ( DOT ID)+ ( ',' ID ( DOT ID)+ )+ )?
+	;
+importRestricting
+	:( importByKindDef STATEND )+
+	|( importByNameDef STATEND )+
+	|( importGroupDef STATEND)+
+	;
+importNormally
+	:importFrom BRACE_L importRestricting BRACE_R
+	;
+importSuppressionDef
+	:importFrom 'all' 'except' BRACE_L importRestricting BRACE_R
+	;
+importRecusively
+	:importFrom 'recusive' BRACE_L importRestricting BRACE_R
+	;
+importOtherLanguage
+	:importFrom 'language' CHARSTRING_LITERAL 'all'
+	;
+importFrom
+	:'import' 'from' ID
+	;
+importDef
+	:importOtherLanguage STATEND
+	|importRecusively
+	|importNormally
+	|importSuppressionDef
+	;
+/*******************************************************************
+				@END : "import definition"
+********************************************************************/
 attributeDef
 	:'with' BRACE_L .*? BRACE_R
 	;
@@ -893,5 +790,27 @@ module
 compilationUnit
 	: module
 	;
+	
+/*****************************************************************************************************************
+							Following part is concurrent TTCN related definations.
+							@See John Wiley's "An introduction to TTCN3"
+@START
+*****************************************************************************************************************/
 
-
+portMessageDec
+	: ( 'in' | 'out' | 'inout') ID ( ',' ID)+
+	| ( 'in' | 'out' | 'inout') 'all'
+	;
+portDef
+	:'type' 'port' ID 'message' PARENTHESE_R ( portMessageDec STATEND )+ PARENTHESE_L
+	;
+portDec
+	:'port' ID ID
+	;
+componentDef
+	:'type' 'component' ID PARENTHESE_R ( ( portDec | varDef | constDef | timerDef ) STATEND )+ PARENTHESE_L
+	;
+timerDef
+	:'timer' ID ASSIGN FLOAT_LITERAL
+	;
+/*@END*/

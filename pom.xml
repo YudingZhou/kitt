@@ -16,13 +16,7 @@
 		<stringtemplate.version>3.2.1</stringtemplate.version>
 		<plugin.build-helper-maven-plugin.version>1.4</plugin.build-helper-maven-plugin.version>
 		<plugin.exec-maven-plugin.version>1.2.1</plugin.exec-maven-plugin.version>
-		<antlr4.m2.root>${user.home}/.m2/repository/org/antlr/</antlr4.m2.root>
-		<antlr4.cp>${antlr4.cp.1};${antlr4.cp.2};${antlr4.cp.3};${antlr4.cp.4};${antlr4.cp.5}</antlr4.cp>
-		<antlr4.cp.1>${antlr4.m2.root}/antlr4/${antlr4.version}/antlr4-${antlr4.version}.jar</antlr4.cp.1>
-		<antlr4.cp.2>${antlr4.m2.root}/antlr4-runtime/${antlr4.version}/antlr4-runtime-${antlr4.version}.jar</antlr4.cp.2>
-		<antlr4.cp.3>${antlr4.m2.root}/antlr-runtime/${antlr.version}/antlr-runtime-${antlr.version}.jar</antlr4.cp.3>
-		<antlr4.cp.4>${antlr4.m2.root}/stringtemplate/${stringtemplate.version}/stringtemplate-${stringtemplate.version}.jar</antlr4.cp.4>
-		<antlr4.cp.5>${antlr4.m2.root}/ST4/${ST4.version}/ST4-${ST4.version}.jar</antlr4.cp.5>
+		<antlr4.cp>${basedir}/lib/antlr-4.2-complete.jar</antlr4.cp>
 		<antlr4.main>org.antlr.v4.Tool</antlr4.main>
 		<antlr4.parser.g4>${basedir}/resources/Tes.g4</antlr4.parser.g4>
 		<antlr4.parser.src>${basedir}/src/org/quantumlabs/kitt/core/parse/</antlr4.parser.src>

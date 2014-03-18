@@ -1,9 +1,9 @@
 grammar Tes;
 
 
-@header{
+/*@header{
 package org.quantumlabs.kitt.core.parse;
-}
+}*/
 
 
 WS
@@ -623,14 +623,14 @@ importableType
 	|'modulepar' 
 	;
 importByKindDef
-	:importableType 'all' ( 'except' ID ( ',' ID)+ )?
+	:importableType 'all' ( 'except' ID ( ',' ID)* )?
 	;
 importByNameDef
-	:importableType ID ( ',' ID )+
+	:importableType ID ( ',' ID )*
 	;
 importGroupDef
 	:'group' ID ( DOT ID)+
-	|'group' 'all' ( 'except' ID ( DOT ID)+ ( ',' ID ( DOT ID)+ )+ )?
+	|'group' 'all' ( 'except' ID ( DOT ID)* ( ',' ID ( DOT ID)* )* )?
 	;
 importRestricting
 	:( importByKindDef STATEND )+
@@ -640,23 +640,24 @@ importRestricting
 importNormally
 	:importFrom BRACE_L importRestricting BRACE_R
 	;
-importSuppressionDef
-	:importFrom 'all' 'except' BRACE_L importRestricting BRACE_R
+importAllAndSuppressionDef
+	:importFrom 'all' ( 'except' BRACE_L importRestricting BRACE_R )?
 	;
 importRecusively
 	:importFrom 'recusive' BRACE_L importRestricting BRACE_R
 	;
 importOtherLanguage
-	:importFrom 'language' CHARSTRING_LITERAL 'all'
+	:importFrom 'language' CHARSTRING_LITERAL 'all'STATEND
+	|importFrom 'language' CHARSTRING_LITERAL BRACE_L importRestricting BRACE_R
 	;
 importFrom
 	:'import' 'from' ID
 	;
 importDef
-	:importOtherLanguage STATEND
+	:importOtherLanguage 
 	|importRecusively
 	|importNormally
-	|importSuppressionDef
+	|importAllAndSuppressionDef
 	;
 /*******************************************************************
 				@END : "import definition"

@@ -4,16 +4,17 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.quantumlabs.kitt.core.parse.TesLexer;
-import org.quantumlabs.kitt.core.parse.TesParser;
 import org.quantumlabs.kitt.core.parse.TesParser.ImportDefContext;
+import org.quantumlabs.kitt.ui.util.exception.StackTracableException;
 
 public class ImportDeclaration extends TextBasedTTCNElement implements IImportDeclaration {
 
 	private String sourceModuleName;
 	private List<String> importedElements;
 	private boolean all;
+	private boolean dirty = true;
 
 	public ImportDeclaration(ITTCNElement ancestor, String name) {
 		super(ancestor, name);
@@ -24,7 +25,8 @@ public class ImportDeclaration extends TextBasedTTCNElement implements IImportDe
 	public int getOffset() {
 		// import from ID. We define the first ID as the start offset of
 		// import declaration.
-		return ((TerminalNode) getCorrespondingParserRuleContext().getChild(2)).getSymbol().getStartIndex();
+		checkDirtyStatus();
+		return offset;
 	}
 
 	@Override
@@ -34,16 +36,27 @@ public class ImportDeclaration extends TextBasedTTCNElement implements IImportDe
 
 	@Override
 	public String getSourceModule() {
+		checkDirtyStatus();
 		return sourceModuleName;
+	}
+
+	// Status checking implements "lazy initializing pattern", all needed
+	// information will be initialized until requested.
+	private void checkDirtyStatus() {
+		if (dirty) {
+			parse(getCorrespondingParserRuleContext());
+		}
 	}
 
 	@Override
 	public String[] getImportedElements() {
+		checkDirtyStatus();
 		return importedElements.toArray(new String[importedElements.size()]);
 	}
 
 	@Override
 	public boolean isImportAll() {
+		checkDirtyStatus();
 		return all;
 	}
 
@@ -57,5 +70,31 @@ public class ImportDeclaration extends TextBasedTTCNElement implements IImportDe
 
 	public void addImportElement(String... names) {
 		importedElements.addAll(Arrays.asList(names));
+	}
+
+	@Override
+	public void setCorrespondingParserRuleContext(ParserRuleContext context) {
+		super.setCorrespondingParserRuleContext(context);
+		dirty = true;
+	}
+
+	@Override
+	public void parse(ParserRuleContext context) {
+		ImportDefContext importDef = (ImportDefContext) context;
+		// @see .g4 "importFrom" rule
+		setSourceModule(importDef.importFrom().ID().getText());
+		offset = ((TerminalNode)importDef.importFrom().ID()).getSymbol().getStartIndex();
+		if (importDef.importAllAndSuppressionDef() != null) {
+			//TODO : analyze imported elements
+		} else if (importDef.importNormally() != null) {
+			//TODO : analyze imported elements
+		} else if (importDef.importOtherLanguage() != null) {
+			//TODO : analyze imported elements
+		} else if (importDef.importRecusively() != null) {
+			//TODO : analyze imported elements
+		} else {
+			throw new StackTracableException("Alternative of import definite rule context is not right.");
+		}
+		dirty = false;
 	}
 }

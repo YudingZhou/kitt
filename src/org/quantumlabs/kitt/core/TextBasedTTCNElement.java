@@ -12,6 +12,9 @@ package org.quantumlabs.kitt.core;
  * */
 public abstract class TextBasedTTCNElement extends AbstractTTCNElement implements IOffsetable {
 
+	protected int offset = -1;
+	protected int len = 0;
+
 	public TextBasedTTCNElement(ITTCNElement ancestor) {
 		super(ancestor);
 	}
@@ -27,11 +30,17 @@ public abstract class TextBasedTTCNElement extends AbstractTTCNElement implement
 
 	@Override
 	public int getOffset() {
-		return getCorrespondingParserRuleContext().start.getStartIndex();
+		if (offset == -1) {
+			offset = getCorrespondingParserRuleContext().start.getStartIndex();
+		}
+		return offset;
 	}
 
 	@Override
 	public int getLen() {
-		return getCorrespondingParserRuleContext().stop.getStopIndex() - getOffset() + 1;
+		if (len == 0) {
+			len = getCorrespondingParserRuleContext().stop.getStartIndex() - getOffset() + 1;
+		}
+		return len;
 	}
 }

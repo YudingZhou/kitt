@@ -129,11 +129,8 @@ public class CompilationUnit extends AbstractTTCNElement implements ICompilation
 
 				@Override
 				public void internalEnterImportDef(ImportDefContext ctx) {
-					ImportDefContext importDef = ctx;
-					String importedModuleName = importDef.ID().get(0).getText();
 					ImportDeclaration importDec = new ImportDeclaration(CompilationUnit.this, "NONE");
-					importDec.setCorrespondingParserRuleContext(importDef);
-					importDec.setSourceModule(importedModuleName);
+					importDec.setCorrespondingParserRuleContext(ctx);
 				}
 
 				@Override

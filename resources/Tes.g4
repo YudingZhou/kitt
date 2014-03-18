@@ -1,9 +1,9 @@
 grammar Tes;
 
 
-/*@header{
+@header{
 package org.quantumlabs.kitt.core.parse;
-}*/
+}
 
 
 WS
@@ -638,26 +638,26 @@ importRestricting
 	|( importGroupDef STATEND)+
 	;
 importNormally
-	:importFrom BRACE_L importRestricting BRACE_R
+	:BRACE_L importRestricting BRACE_R
 	;
 importAllAndSuppressionDef
-	:importFrom 'all' ( 'except' BRACE_L importRestricting BRACE_R )?
+	:'all' ( 'except' BRACE_L importRestricting BRACE_R )?
 	;
 importRecusively
-	:importFrom 'recusive' BRACE_L importRestricting BRACE_R
+	:'recusive' BRACE_L importRestricting BRACE_R
 	;
 importOtherLanguage
-	:importFrom 'language' CHARSTRING_LITERAL 'all'STATEND
-	|importFrom 'language' CHARSTRING_LITERAL BRACE_L importRestricting BRACE_R
+	:'language' CHARSTRING_LITERAL 'all'STATEND
+	|'language' CHARSTRING_LITERAL BRACE_L importRestricting BRACE_R
 	;
 importFrom
 	:'import' 'from' ID
 	;
 importDef
-	:importOtherLanguage 
-	|importRecusively
-	|importNormally
-	|importAllAndSuppressionDef
+	: importFrom importOtherLanguage 
+	| importFrom importRecusively
+	| importFrom importNormally
+	| importFrom importAllAndSuppressionDef
 	;
 /*******************************************************************
 				@END : "import definition"

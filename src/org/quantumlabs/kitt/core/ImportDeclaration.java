@@ -14,7 +14,6 @@ public class ImportDeclaration extends TextBasedTTCNElement implements IImportDe
 	private String sourceModuleName;
 	private List<String> importedElements;
 	private boolean all;
-	private boolean dirty = true;
 
 	public ImportDeclaration(ITTCNElement ancestor, String name) {
 		super(ancestor, name);
@@ -38,14 +37,6 @@ public class ImportDeclaration extends TextBasedTTCNElement implements IImportDe
 	public String getSourceModule() {
 		checkDirtyStatus();
 		return sourceModuleName;
-	}
-
-	// Status checking implements "lazy initializing pattern", all needed
-	// information will be initialized until requested.
-	private void checkDirtyStatus() {
-		if (dirty) {
-			parse(getCorrespondingParserRuleContext());
-		}
 	}
 
 	@Override
@@ -73,12 +64,6 @@ public class ImportDeclaration extends TextBasedTTCNElement implements IImportDe
 	}
 
 	@Override
-	public void setCorrespondingParserRuleContext(ParserRuleContext context) {
-		super.setCorrespondingParserRuleContext(context);
-		dirty = true;
-	}
-
-	@Override
 	public void parse(ParserRuleContext context) {
 		ImportDefContext importDef = (ImportDefContext) context;
 		// @see .g4 "importFrom" rule
@@ -95,6 +80,5 @@ public class ImportDeclaration extends TextBasedTTCNElement implements IImportDe
 		} else {
 			throw new StackTracableException("Alternative of import definite rule context is not right.");
 		}
-		dirty = false;
 	}
 }

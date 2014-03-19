@@ -105,7 +105,7 @@ public interface ITTCNKeyWords {
 	String KW92 = "override";
 
 	String KW93 = "param";
-	String KW94 = "Modulepar";
+	String KW94 = "modulepar";
 	String KW95 = "pass";
 	String KW96 = "pattern";
 	String KW97 = "port";

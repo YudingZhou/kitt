@@ -25,6 +25,17 @@ public abstract class AbstractTTCNElement implements ITTCNElement {
 	protected IResource correspondingResource;
 	private ParserRuleContext correspondingParserRule;
 	protected List<Token> errors;
+	/**
+	 * Status checking implements <strong>lazy initializing pattern</strong>, all needed
+	 * information will be initialized until requested. <br>
+	 * The idea is <br>
+	 * 1.Dirty status should be <code>true</code> after RuleContext setting.<br>
+	 * 2.Any information requests should check dirty status and parse RuleContext
+	 * if it is dirty.<br>
+	 * 3.After parsing, dirty status back to false until next RuleContext
+	 * setting.
+	 */
+	private boolean dirty = true;
 
 	@Deprecated
 	// Since some element doesn't have identifier, so the name doesn't make
@@ -141,8 +152,9 @@ public abstract class AbstractTTCNElement implements ITTCNElement {
 	 * Call me as soon as the element being instantiated. Especially, before
 	 * {@link #addChild(ITTCNElement)}
 	 * */
-	public void setCorrespondingParserRuleContext(ParserRuleContext context) {
+	final public void setCorrespondingParserRuleContext(ParserRuleContext context) {
 		correspondingParserRule = context;
+		dirty = true;
 	}
 
 	@Override
@@ -238,7 +250,7 @@ public abstract class AbstractTTCNElement implements ITTCNElement {
 	 * */
 	@Override
 	public void parse(ParserRuleContext context) {
-		setCorrespondingParserRuleContext(context);
+		//throw new UnsupportedOperationException(String.format( "No parsing implementation for %s", getClass().getSimpleName()));
 	}
 
 	/**
@@ -263,5 +275,17 @@ public abstract class AbstractTTCNElement implements ITTCNElement {
 				collection.add((T) element);
 			}
 		}
+	}
+	
+	//Do not over write!
+	final protected void checkDirtyStatus() {
+		if (dirty) {
+			parse(getCorrespondingParserRuleContext());
+			dirty = false;
+		}
+	}
+	
+	protected boolean isDirty(){
+		return dirty;
 	}
 }

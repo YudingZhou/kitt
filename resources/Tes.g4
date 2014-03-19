@@ -663,10 +663,23 @@ importDef
 				@END : "import definition"
 ********************************************************************/
 attributeDef
-	:'with' BRACE_L .*? BRACE_R
+	:'with' BRACE_L ( ( ( 'dsiplay' | 'encode' | 'variant' | 'extension' ) ( PARENTHESE_L reference PARENTHESE_R )? CHARSTRING_LITERAL ) STATEND )+ BRACE_R
+	;
+groupable
+	:typeDef
+	|constDef
+	|signatureDef /*TODO*/
+	|moduleParDef /*TODO*/
+	|controlDef
+	|groupDef /*TODO*/
+	|importDef
+	|templateDef
+	|functionDef
+	|altStepDef
+	|testCaseDef
 	;
 groupDef
-	:'group' ID BRACE_L .*? BRACE_R
+	:'group' ID BRACE_L groupable BRACE_R
 	;
 controlDef
 	:'control' BRACE_L state+ BRACE_R
@@ -777,7 +790,6 @@ tld
 	|signatureDef /*TODO*/
 	|moduleParDef /*TODO*/
 	|controlDef
-	|attributeDef /*TODO*/
 	|groupDef /*TODO*/
 	|importDef
 	|templateDef
@@ -786,7 +798,7 @@ tld
 	|testCaseDef
 	;
 module
-	:'module' ID BRACE_L (tld STATEND?)*  BRACE_R 
+	:'module' ID 'language' CHARSTRING_LITERAL BRACE_L (tld STATEND?)*  BRACE_R 
 	;
 compilationUnit
 	: module

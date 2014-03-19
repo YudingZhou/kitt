@@ -289,6 +289,7 @@ public class TTCNCore {
 		 * Don't use for this moment. damage() method is not capable to compute
 		 * proper damaged range.
 		 */
+		@Deprecated
 		class TTCNElementReconciler implements IDocumentListener {
 			ReconcilerContext context;
 
@@ -384,8 +385,8 @@ public class TTCNCore {
 						while (streamAboutToParse.index() < size) {
 							ParserRuleContext ruleContext = getCoreIndex().getParser().parse(streamAboutToParse,
 									context.affectedParent.getCorrespondingParserRuleContext().getClass());
-							ITTCNElement newChild = getAdaptedTTCNElement(context.affectedParent, ruleContext);
-							newChild.parse(ruleContext);
+							AbstractTTCNElement newChild = (AbstractTTCNElement) getAdaptedTTCNElement(context.affectedParent, ruleContext);
+							newChild.setCorrespondingParserRuleContext(ruleContext);
 							context.affectedParent.addChild(newChild);
 						}
 					}

@@ -679,7 +679,7 @@ groupable
 	|testCaseDef
 	;
 groupDef
-	:'group' ID BRACE_L groupable BRACE_R
+	:'group' ID BRACE_L ( groupable STATEND? )+ BRACE_R
 	;
 controlDef
 	:'control' BRACE_L state+ BRACE_R
@@ -798,7 +798,7 @@ tld
 	|testCaseDef
 	;
 module
-	:'module' ID 'language' CHARSTRING_LITERAL BRACE_L (tld STATEND?)*  BRACE_R 
+	:'module' ID ( 'language' CHARSTRING_LITERAL )? BRACE_L (tld STATEND?)*  BRACE_R 
 	;
 compilationUnit
 	: module

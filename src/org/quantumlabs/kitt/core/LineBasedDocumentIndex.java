@@ -130,12 +130,9 @@ public class LineBasedDocumentIndex implements IDocumentIndex {
 		for (; startLine < lines.size(); startLine++) {
 			lines.get(startLine).notifyLineNumberChanged(affectedCount);
 		}
-
-		if (KITTParameter.isBETA()) {
-			logIndex();
-		}
 	}
 
+	@Deprecated
 	private void logIndex() {
 		StringBuilder sBuilder = new StringBuilder();
 		for (Entry<String, Word> entry : index.entrySet()) {
@@ -144,6 +141,7 @@ public class LineBasedDocumentIndex implements IDocumentIndex {
 		System.out.println(sBuilder.toString());
 	}
 
+	@Deprecated
 	private void rewrite(DocumentEvent event) throws BadLocationException {
 		Document doc = (Document) event.getDocument();
 		String replacement = event.getText();

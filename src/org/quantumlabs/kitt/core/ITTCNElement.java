@@ -165,11 +165,6 @@ public interface ITTCNElement extends Comparable<ITTCNElement> {
 	ParserRuleContext getCorrespondingParserRuleContext();
 
 	/**
-	 * Parse a RuleContext into a TTCN element.
-	 * */
-	void parse(ParserRuleContext context);
-
-	/**
 	 * Return pairs with start and end index of error token, if any.
 	 * */
 	Pair<Integer, Integer>[] getErrors();

@@ -124,12 +124,14 @@ public class TTCNCoreIndex {
 	 * 1.Re-parse IResource. 2. Replace corresponding RuleContext.
 	 * */
 	public void reSetupIndex(IFile source) {
-		ITTCNElement element = find(source);
+		AbstractTTCNElement element = (AbstractTTCNElement) find(source);
 		Assert.isNotNull(element,
 				String.format("Unindexed file can't be re-setup : %s", source.getLocation().toString()));
 		try {
- 			element.clear();
-			element.parse(getParser().parse(CoreParser.openStream(source), ModuleContext.class));
+			element.clear();
+			element.setCorrespondingParserRuleContext(getParser().parse(CoreParser.openStream(source),
+					ModuleContext.class));
+			element.refresh();
 		} catch (Exception e) {
 			if (Logger.isErrorEnable()) {
 				Logger.logError(toString(), e, e.getMessage(),
@@ -141,12 +143,14 @@ public class TTCNCoreIndex {
 	}
 
 	public void reSetupIndexWithContent(IFile source, String newContent) {
-		ITTCNElement element = find(source);
+		AbstractTTCNElement element = (AbstractTTCNElement) find(source);
 		Assert.isNotNull(element,
 				String.format("Unindexed file can't be re-setup : %s", source.getLocation().toString()));
 		try {
 			element.clear();
-			element.parse(getParser().parse(CoreParser.openStream(newContent), ModuleContext.class));
+			element.setCorrespondingParserRuleContext(getParser().parse(CoreParser.openStream(source),
+					ModuleContext.class));
+			element.refresh();
 		} catch (Exception e) {
 			if (Logger.isErrorEnable()) {
 				Logger.logError(toString(), e, e.getMessage(),
@@ -193,7 +197,7 @@ public class TTCNCoreIndex {
 			// compilationUnit = new
 			// CompilationUnit(find(resource.getParent()));
 			compilationUnit = new CompilationUnit();
-			compilationUnit.parse(getParser().parse(CoreParser.openStream(resource), ModuleContext.class));
+			compilationUnit.setCorrespondingParserRuleContext(getParser().parse(CoreParser.openStream(resource), ModuleContext.class));
 			ITTCNElement ancestor = TTCNCore.instance().getCoreIndex().pull(resource.getProject());
 			compilationUnit.setAncestor(ancestor);
 		}

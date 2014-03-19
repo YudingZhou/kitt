@@ -211,4 +211,6 @@ public final class SackConstant {
 	public static final int OUTLINE_SORT_POLICY_ALPHABETIC = 1;
 
 	public static final int OUTLINE_SORT_POLICY_OFFSET = 2;
+
+	public static final int RULE_CONTEXT_DEPTH_TLD = 3;
 }

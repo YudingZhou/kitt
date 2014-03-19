@@ -26,7 +26,7 @@ import org.quantumlabs.kitt.core.parse.TesParser.TemplateDefContext;
 import org.quantumlabs.kitt.core.parse.TesParser.TestCaseDefContext;
 import org.quantumlabs.kitt.core.parse.TesParser.TypeDefContext;
 import org.quantumlabs.kitt.core.parse.TesParser.UnionTypeDefContext;
-import org.quantumlabs.kitt.core.util.Callback;
+import org.quantumlabs.kitt.core.semantic.ScopeManager;
 import org.quantumlabs.kitt.core.util.trace.Logger;
 
 public class CompilationUnit extends AbstractTTCNElement implements ICompilationUnit {
@@ -119,7 +119,6 @@ public class CompilationUnit extends AbstractTTCNElement implements ICompilation
 		setID(moduleContext.ID().getText());
 		setCorrespondingParserRuleContext(moduleContext);
 		ParseTreeWalker walker = new ParseTreeWalker();
-		try {
 			walker.walk(new BaseListenerPro() {
 
 				@Override
@@ -129,41 +128,46 @@ public class CompilationUnit extends AbstractTTCNElement implements ICompilation
 
 				@Override
 				public void internalEnterImportDef(ImportDefContext ctx) {
+					if(!ScopeManager.isTLD(ctx)){
+						return;
+					}
 					ImportDeclaration importDec = new ImportDeclaration(CompilationUnit.this, "NONE");
 					importDec.setCorrespondingParserRuleContext(ctx);
 				}
 
 				@Override
 				public void internalEnterFunctionDef(FunctionDefContext ctx) {
-					try {
-						FunctionDefContext funDef = ctx;
-						funDef.start.getStartIndex();
-						String funName = funDef.functionDec().ID().getText();
-						ReturnExprContext returnExpr = funDef.returnExpr();
-						FunctionParaContext paraContext = funDef.functionPara();
-						FunctionRunsOnContext runsOnContext = funDef.functionRunsOn();
-						FunctionDeclaration fun = new FunctionDeclaration(CompilationUnit.this, funName);
-						fun.setCorrespondingParserRuleContext(funDef);
-						fun.setID(funName);
-						if (returnExpr != null) {
-							ReturnExpr tReturnExpr = new ReturnExpr(fun, "No name//TODO");
-							tReturnExpr.setExpr(returnExpr.reference().getText());
-							fun.setReturnExpr(tReturnExpr);
-						}
-						if (paraContext != null) {
-							ArgumentDeclarationList paras = new ArgumentDeclarationList(fun);
-							paras.setCorrespondingParserRuleContext(paraContext);
-						}
-						if (runsOnContext != null) {
-							fun.setRunsOnType(runsOnContext.ID(runsOnContext.ID().size() - 1).getText());
-						}
-					} catch (Exception e) {
-						System.out.println();
+					if (!ScopeManager.isTLD(ctx)) {
+						return;
+					}
+					FunctionDefContext funDef = ctx;
+					funDef.start.getStartIndex();
+					String funName = funDef.functionDec().ID().getText();
+					ReturnExprContext returnExpr = funDef.returnExpr();
+					FunctionParaContext paraContext = funDef.functionPara();
+					FunctionRunsOnContext runsOnContext = funDef.functionRunsOn();
+					FunctionDeclaration fun = new FunctionDeclaration(CompilationUnit.this, funName);
+					fun.setCorrespondingParserRuleContext(funDef);
+					fun.setID(funName);
+					if (returnExpr != null) {
+						ReturnExpr tReturnExpr = new ReturnExpr(fun, "No name//TODO");
+						tReturnExpr.setExpr(returnExpr.reference().getText());
+						fun.setReturnExpr(tReturnExpr);
+					}
+					if (paraContext != null) {
+						ArgumentDeclarationList paras = new ArgumentDeclarationList(fun);
+						paras.setCorrespondingParserRuleContext(paraContext);
+					}
+					if (runsOnContext != null) {
+						fun.setRunsOnType(runsOnContext.ID(runsOnContext.ID().size() - 1).getText());
 					}
 				}
 
 				@Override
 				public void internalEnterTypeDef(TypeDefContext ctx) {
+					if(!ScopeManager.isTLD(ctx)){
+						return;
+					}
 					TypeDefContext typeDef = ctx;
 					PrimitiveTypeDefContext primitiveDef = typeDef.primitiveTypeDef();
 					RecordTypeDefContext recordDef = typeDef.recordTypeDef();
@@ -202,11 +206,13 @@ public class CompilationUnit extends AbstractTTCNElement implements ICompilation
 					typeDeclaration.setCorrespondingParserRuleContext(typeDef);
 					typeDeclaration.setID(id);
 					typeDeclaration.setSuperType(type);
-
 				}
 
 				@Override
 				public void internalEnterConstDef(ConstDefContext ctx) {
+					if(!ScopeManager.isTLD(ctx)){
+						return;
+					}
 					ConstDefContext consDef = ctx;
 					String id = null;
 					String type = null;
@@ -221,11 +227,13 @@ public class CompilationUnit extends AbstractTTCNElement implements ICompilation
 					constDec.setCorrespondingParserRuleContext(consDef);
 					constDec.setID(id);
 					constDec.setType(type);
-
 				}
 
 				@Override
 				public void internalEnterAttributeDef(AttributeDefContext ctx) {
+					if(!ScopeManager.isTLD(ctx)){
+						return;
+					}
 					AttributeDefContext attributeDef = ctx;
 					AttributeDeclaration attribute = new AttributeDeclaration(CompilationUnit.this, "NONE//TODO");
 					attribute.setCorrespondingParserRuleContext(attributeDef);
@@ -233,7 +241,9 @@ public class CompilationUnit extends AbstractTTCNElement implements ICompilation
 
 				@Override
 				public void internalEnterTemplateDef(TemplateDefContext ctx) {
-
+					if(!ScopeManager.isTLD(ctx)){
+						return;
+					}
 					TemplateDefContext templateDef = ctx;
 					String id = templateDef.templateDec().typeDec()
 							.ID((templateDef.templateDec().typeDec().ID().size() - 1)).getText();
@@ -242,19 +252,23 @@ public class CompilationUnit extends AbstractTTCNElement implements ICompilation
 					Template template = new Template(CompilationUnit.this, id);
 					template.setCorrespondingParserRuleContext(templateDef);
 					template.setType(type);
-
 				}
 
 				@Override
 				public void internalEnterModuleParDef(ModuleParDefContext ctx) {
+					if(!ScopeManager.isTLD(ctx)){
+						return;
+					}
 					ModuleParDefContext moduleParDef = ctx;
 					ModuleParDeclaration par = new ModuleParDeclaration(CompilationUnit.this, "NONE//TODO");
 					par.setCorrespondingParserRuleContext(moduleParDef);
-
 				}
 
 				@Override
 				public void internalEnterGroupDef(GroupDefContext ctx) {
+					if(!ScopeManager.isTLD(ctx)){
+						return;
+					}
 					GroupDefContext groupDef = ctx;
 					GroupDeclaration group = new GroupDeclaration(CompilationUnit.this, "NONE");
 					group.setCorrespondingParserRuleContext(groupDef);
@@ -262,6 +276,9 @@ public class CompilationUnit extends AbstractTTCNElement implements ICompilation
 
 				@Override
 				public void internalEnterControlDef(ControlDefContext ctx) {
+					if(!ScopeManager.isTLD(ctx)){
+						return;
+					}
 					ControlDefContext controlDef = ctx;
 					ControlPart control = new ControlPart(CompilationUnit.this, "NONE//TODO");
 					control.setCorrespondingParserRuleContext(controlDef);
@@ -269,6 +286,9 @@ public class CompilationUnit extends AbstractTTCNElement implements ICompilation
 
 				@Override
 				public void internalEnterSignatureDef(SignatureDefContext ctx) {
+					if(!ScopeManager.isTLD(ctx)){
+						return;
+					}
 					SignatureDefContext sigDef = ctx;
 					SignatureDeclaration signature = new SignatureDeclaration(CompilationUnit.this, "NONE//TODO");
 					signature.setCorrespondingParserRuleContext(sigDef);
@@ -276,6 +296,9 @@ public class CompilationUnit extends AbstractTTCNElement implements ICompilation
 
 				@Override
 				public void internalEnterAltStepDef(AltStepDefContext ctx) {
+					if(!ScopeManager.isTLD(ctx)){
+						return;
+					}
 					AltStepDefContext altstepDef = ctx;
 					AltStepDeclaration alt = new AltStepDeclaration(CompilationUnit.this, "NONE");
 					alt.setCorrespondingParserRuleContext(altstepDef);
@@ -283,6 +306,9 @@ public class CompilationUnit extends AbstractTTCNElement implements ICompilation
 
 				@Override
 				public void internalEnterTestCaseDef(TestCaseDefContext ctx) {
+					if(!ScopeManager.isTLD(ctx)){
+						return;
+					}
 					TestCaseDefContext testCaseDef = ctx;
 					String id = testCaseDef.ID(0).getText();
 					TestCase testCase = new TestCase(CompilationUnit.this, "NONE");
@@ -295,10 +321,6 @@ public class CompilationUnit extends AbstractTTCNElement implements ICompilation
 					errors.add(node.getSymbol());
 				}
 			}, moduleContext);
-		} finally {
-			fireEventToCallBacks();
-		}
-
 	}
 
 	protected void handleError(Exception e, Object ctx) {
@@ -307,15 +329,9 @@ public class CompilationUnit extends AbstractTTCNElement implements ICompilation
 		}
 	}
 
-	private void fireEventToCallBacks() {
-		for (Callback callBack : callBacks) {
-			callBack.call(this);
-		}
-	}
-
 	@Override
 	public void clear() {
-		children2.clear();
+		super.clear();
 		setID("");
 	}
 

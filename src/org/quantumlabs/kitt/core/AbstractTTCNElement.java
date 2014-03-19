@@ -103,8 +103,7 @@ public abstract class AbstractTTCNElement implements ITTCNElement {
 	}
 
 	public ITTCNElement[] getChildren() {
-		// Collection<ITTCNElement> values = children.values();
-		// return values.toArray(new ITTCNElement[values.size()]);
+		checkDirtyStatus();
 		return children2.toArray(new ITTCNElement[children2.size()]);
 	}
 
@@ -248,8 +247,7 @@ public abstract class AbstractTTCNElement implements ITTCNElement {
 	/**
 	 * Default implementation do nothing but binding ParserRuleContext.
 	 * */
-	@Override
-	public void parse(ParserRuleContext context) {
+	protected void parse(ParserRuleContext context) {
 		//throw new UnsupportedOperationException(String.format( "No parsing implementation for %s", getClass().getSimpleName()));
 	}
 
@@ -277,15 +275,41 @@ public abstract class AbstractTTCNElement implements ITTCNElement {
 		}
 	}
 	
-	//Do not over write!
+	/**
+	 * Check -> parse -> clean
+	 * <br>
+	 * Do not over write!
+	 * */
 	final protected void checkDirtyStatus() {
-		if (dirty) {
+		if (isDirty()) {
 			parse(getCorrespondingParserRuleContext());
-			dirty = false;
+			cleanDirtyStatus();
 		}
 	}
 	
 	protected boolean isDirty(){
 		return dirty;
+	}
+
+	/**
+	 * Instead of <strong>Lazy initializing</strong>, {@link #refresh()}
+	 * enforces this element to re-parse RuleContext immediately and clean dirty
+	 * status.
+	 * */
+	public void refresh() {
+		clear();
+		parse(getCorrespondingParserRuleContext());
+		cleanDirtyStatus();
+	}
+
+	private void cleanDirtyStatus() {
+		dirty = false;
+		fireSelfToCallBacks();
+	}
+	
+	private void fireSelfToCallBacks() {
+		for (Callback callBack : callBacks) {
+			callBack.call(this);
+		}
 	}
 }

@@ -13,9 +13,9 @@ To my darling
 
 ====
 
-"TTCN is a #$%@&* language" I heard from my colleague ( imagine what he said ), I was also suffering that, it was not only because of verbosity of TTCN3 but also there was no any good IDE ( I tried some, sometime even worse than notepad ), I was done with that. Then KITT came to my mind. : )
+"TTCN is a #$%@&* language" I heard from my colleague ( imagine what he said ), I suffered it a lot, it was not only due to verbosity of TTCN3 but also the lack of good IDE ( some of ones I've tried are even worse than notepad! ), 'I was done with that'. And it was then KITT came to my mind. : )
 
-KITT is short for KITT is TTCN tool, it commits to provide a cool and friendly UX to read and write TTCN3 code. You can use it for free, if you feel it's nice, please share it to others. For more details, please see WIKI.
+KITT is short for KITT is TTCN tool, aiming at providing a cool and friendly UX to read and write TTCN3 code with. You can use it for free, please share it if you consider it a nice tool. For more details, please see Wiki.
 
 
 

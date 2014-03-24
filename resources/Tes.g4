@@ -250,6 +250,7 @@ lengthExpr
 propertyExpr
 	:'self' COLON ( reference | functionBuildInCall )
 	|ID COLON ( reference | functionBuildInCall )
+	|reference COLON functionBuildInCall
 	;
 fragment
 LETER_LITERAL
@@ -581,7 +582,7 @@ functionBody
 	: state+ /*TODO*/
 	;
 returnExpr
-	:'return' reference
+	:'return' reference?
 	;
 functionDec
 	:'function' ID 
@@ -595,19 +596,21 @@ functionDef
 	| 'external' functionDec /*TODO*/
 	;
 altStepDef
-	: 'altstep' ID PARENTHESE_L PARENTHESE_R 'runs' 'on' ID BRACE_L state+ BRACE_R/*TODO*/
+	: 'altstep' ID PARENTHESE_L functionPara PARENTHESE_R ( 'runs' 'on' ID ( 'system' ID)? )? BRACE_L ( varDef STATEND | altStat)* BRACE_R/*TODO*/
+	;
+blockOperation
+	:'receive' ( PARENTHESE_L functionActualPara PARENTHESE_R )?
+	|'timeout'
 	;
 altStatPrimary
-	:'[' ']' state BRACE_L state+ BRACE_R
-	|state BRACE_L state+ BRACE_R
+	:'[' booleanExpr? ']' 'any'? reference DOT blockOperation ( redirectionDec )?  BRACE_L nonAltState* BRACE_R
 	;
 altStat
 	:'alt' BRACE_L altStatPrimary+ BRACE_R /*TODO*/
 	;
 testCaseDef
-	: 'testcase' ID PARENTHESE_L PARENTHESE_R 'runs' 'on' ID 'system' ID BRACE_L state+ BRACE_R/*TODO*/
+	: 'testcase' ID PARENTHESE_L PARENTHESE_R 'runs' 'on' ID ( 'system' ID )?  BRACE_L state+ BRACE_R/*TODO*/
 	;
-	
 /*******************************************************************
 		@START : "import definition"
 		@See : John.Wiley's "An introduction to TTCN3" chapter7.3
@@ -694,11 +697,12 @@ typeDef
 	|enumeratedTypeDef
 	;
 functionActualPara
-	:( expr | reference | functionCallStat | OMIT | ANYONE | '*' |propertyExpr | templateBlock | ) ( ',' ( expr | reference | functionCallStat | OMIT | ANYONE | '*' | propertyExpr | templateBlock | ))*
+	:( expr | reference | functionCallStat | OMIT | ANYONE | '*' |propertyExpr | templateBlock |'?' | /*Match white space*/ ) ( ',' ( expr | reference | functionCallStat | OMIT | ANYONE | '*' | propertyExpr | templateBlock | '?' | /*Match white space*/ ))*
 	;
 assignment /*for local variable assignment*/
-	:reference ASSIGN ( expr | reference | OMIT | ANYONE | '*' | templateBlock) /*reference assignment*/
-	|typeDec ASSIGN ( expr | reference | OMIT | ANYONE | '*' | templateBlock )/*directly assignment when declaring*/
+	:reference ASSIGN ( expr | reference | OMIT | ANYONE | '*' | functionCallStat ) STATEND /*reference assignment*/
+	|typeDec ASSIGN ( expr | reference | OMIT | ANYONE | '*' | functionCallStat ) STATEND/*directly assignment when declaring*/
+	|( reference | typeDec ) ASSIGN templateBlock 
 	;
 reference
 	:referencePrimary
@@ -708,9 +712,20 @@ referencePrimary
 	:ID
 	|arrayExpr
 	;
+redirectionDec
+	:'->' 'value' reference
+	;
+redirectionDef
+	:reference DOT 'receive' ( PARENTHESE_L functionActualPara PARENTHESE_R )? redirectionDec
+	;
 functionSystemBuildInCall
 	:'log' PARENTHESE_L ( CHARSTRING_LITERAL | reference | functionCallStat ) (',' ( CHARSTRING_LITERAL | reference | functionCallStat) )* PARENTHESE_R 
 	|'connect' PARENTHESE_L functionActualPara PARENTHESE_R
+	|'getverdict'
+	|'setverdict' PARENTHESE_L ( functionActualPara | VERDICTTYPE_LITERAL ) PARENTHESE_R
+	|'execute' PARENTHESE_L functionActualPara PARENTHESE_R
+	|'stop'
+	|'repeat'
 	;
 functionBuildInCall
 	:functionSystemBuildInCall
@@ -719,6 +734,9 @@ functionBuildInCall
 functionCallStat
 	:reference DOT functionBuildInCall
 	|functionBuildInCall
+	;
+altStepCallStat
+	:'[' ']' functionCallStat /*it's looks like function call, so just reuse function call definition*/
 	;
 arrayExpr
 	:ID '[' INTEGER_LITERAL | ']'
@@ -734,23 +752,29 @@ labelStat
 timerStat
 	:'all'? 'timer' DOT 'stop'
 	;
-state
+nonAltState
 	:ifStat STATEND?
 	|forStat 
 	|whileStat
 	|doWhileStat
-	|altStat
 	|varDef STATEND
-	|assignment STATEND
+	|assignment
 	|functionCallStat STATEND
+	|altStepCallStat STATEND
 	|returnExpr STATEND
 	|gotoStat STATEND
 	|labelStat STATEND
 	|timerStat
+	|redirectionDef STATEND
+	;
+state
+	:nonAltState
+	|altStat
 	; 
 booleanOprnt
 	:relationalExpr
 	|logicalExpr
+	|BOOLEAN_LITERAL
 	;
 booleanExpr
 	:booleanOprnt
@@ -803,7 +827,6 @@ module
 compilationUnit
 	: module
 	;
-	
 /*****************************************************************************************************************
 							Following part is concurrent TTCN related definations.
 							@See John Wiley's "An introduction to TTCN3"

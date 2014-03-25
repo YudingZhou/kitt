@@ -108,7 +108,7 @@
          point="org.eclipse.ui.preferencePages">
       <page
             name="KITT"
-            class="org.quantumlabs.kitt.ui.preference.TTCNBasePreferencePage"
+            class="org.quantumlabs.kitt.ui.preference.KITTMainPreferencePage"
             id="org.quantumlabs.kitt.ui.preference.TTCNBasePreferencePage">
       </page>
    </extension>

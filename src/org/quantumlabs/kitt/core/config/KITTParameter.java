@@ -15,6 +15,8 @@ import org.quantumlabs.kitt.ui.editors.KeywordCompletionProcessor;
 import org.quantumlabs.kitt.ui.text.ITTCNColorConstants;
 
 public class KITTParameter {
+	
+	private static IPreferenceStore store;
 
 	/**
 	 * Whether show all project in navigator which are not only KITT project but
@@ -26,12 +28,12 @@ public class KITTParameter {
 	 * This variable means that current software is beta release, enable it will
 	 * cause different behavior , e.g. exception handling level etc..
 	 * */
-	private static boolean BETA = true;
+	private static String BETA = "kitt.beta_model";
 
 	/**
 	 * Logger Level.
 	 * */
-	private static int logLevel = 0;
+	private static String LOG_LEVEL = "kitt.loglevel";
 
 	/**
 	 * Left a interface for coming image adding, deleting operation. suppose it
@@ -187,25 +189,26 @@ public String overallAnnotation;
 	}
 
 	public static void initialize(IPreferenceStore preferenceStore) {
-		// for annotation view showing in overview rule. {@see
-		// TTCNEditor.hightlightOccurrence()}
-		preferenceStore.putValue(Helper.generateColorKey(SackConstant.ANNOTATION_TYPE_OCCURRENCE), "100,250,125");
-		preferenceStore.putValue(Helper.generateTextKey(SackConstant.ANNOTATION_TYPE_OCCURRENCE), "Regular");
-		preferenceStore.putValue(Helper.generateRulerKey(SackConstant.ANNOTATION_TYPE_OCCURRENCE), "rulerkey");
-		preferenceStore.putValue(Helper.generateRulerKey(SackConstant.ANNOTATION_TYPE_OCCURRENCE), "true");
-		preferenceStore.putValue(Helper.generatePresentLayerKey(SackConstant.ANNOTATION_TYPE_OCCURRENCE), "1");
-		preferenceStore
-				.putValue(Helper.generateAnnotationHighlightKey(SackConstant.ANNOTATION_TYPE_OCCURRENCE), "true");
-		// For syntax highlight
-		preferenceStore.setValue(ITTCNColorConstants._TTCN_KEY_WORD, KITTParameter.getTTCNKeyWordDefaultColor());
-		preferenceStore.getString(ITTCNColorConstants._TTCN_KEY_WORD);
-		preferenceStore.setValue(ITTCNColorConstants._TTCN_BRACKET, KITTParameter.getTTCNBracketDefaultColor());
-		preferenceStore.setValue(ITTCNColorConstants._TTCN_OPERATOR, KITTParameter.getTTCNOperatorDefaultColor());
-		preferenceStore.setValue(ITTCNColorConstants._TTCN_MULTIPLE_LINE_COMMENT,
-				KITTParameter.getTTCNMulCommDefaultColor());
-		preferenceStore.setValue(ITTCNColorConstants._TTCN_SINGLE_LINE_COMMENT,
-				KITTParameter.getTTCNSiglCommDefaultColor());
-		preferenceStore.setValue(ITTCNColorConstants._STRING, KITTParameter.getTTCNStringDefaultColor());
+		store = preferenceStore;
+//		// for annotation view showing in overview rule. {@see
+//		// TTCNEditor.hightlightOccurrence()}
+//		preferenceStore.putValue(Helper.generateColorKey(SackConstant.ANNOTATION_TYPE_OCCURRENCE), "100,250,125");
+//		preferenceStore.putValue(Helper.generateTextKey(SackConstant.ANNOTATION_TYPE_OCCURRENCE), "Regular");
+//		preferenceStore.putValue(Helper.generateRulerKey(SackConstant.ANNOTATION_TYPE_OCCURRENCE), "rulerkey");
+//		preferenceStore.putValue(Helper.generateRulerKey(SackConstant.ANNOTATION_TYPE_OCCURRENCE), "true");
+//		preferenceStore.putValue(Helper.generatePresentLayerKey(SackConstant.ANNOTATION_TYPE_OCCURRENCE), "1");
+//		preferenceStore
+//				.putValue(Helper.generateAnnotationHighlightKey(SackConstant.ANNOTATION_TYPE_OCCURRENCE), "true");
+//		// For syntax highlight
+//		preferenceStore.setValue(ITTCNColorConstants._TTCN_KEY_WORD, KITTParameter.getTTCNKeyWordDefaultColor());
+//		preferenceStore.getString(ITTCNColorConstants._TTCN_KEY_WORD);
+//		preferenceStore.setValue(ITTCNColorConstants._TTCN_BRACKET, KITTParameter.getTTCNBracketDefaultColor());
+//		preferenceStore.setValue(ITTCNColorConstants._TTCN_OPERATOR, KITTParameter.getTTCNOperatorDefaultColor());
+//		preferenceStore.setValue(ITTCNColorConstants._TTCN_MULTIPLE_LINE_COMMENT,
+//				KITTParameter.getTTCNMulCommDefaultColor());
+//		preferenceStore.setValue(ITTCNColorConstants._TTCN_SINGLE_LINE_COMMENT,
+//				KITTParameter.getTTCNSiglCommDefaultColor());
+//		preferenceStore.setValue(ITTCNColorConstants._STRING, KITTParameter.getTTCNStringDefaultColor());
 	}
 
 	public static String getTTCNStringDefaultColor() {
@@ -225,19 +228,20 @@ public String overallAnnotation;
 	}
 
 	public static int getLogLevel() {
-		return logLevel;
+		return store.getInt(LOG_LEVEL);
 	}
 
 	public static void setLogLevel(int logLevel) {
-		KITTParameter.logLevel = logLevel;
+		store.setValue(LOG_LEVEL, logLevel);
+		Logger.initialize();
 	}
 
 	public static boolean isBETA() {
-		return BETA;
+		return store.getBoolean(BETA);
 	}
 
 	public static void setBETA(boolean bETA) {
-		BETA = bETA;
+		store.setValue(BETA, bETA);
 	}
 
 	public static boolean isCONFIG_SHOW_ONLY_KITT_PROJECTS() {
@@ -420,5 +424,10 @@ public String overallAnnotation;
 
 	public static void setOutlineSortPolicy(int value) {
 		OUTLINE_SORT_POLICY = value;
+	}
+
+	public static void save() {
+		// TODO Auto-generated method stub
+		
 	}
 }

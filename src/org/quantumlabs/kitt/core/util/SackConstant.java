@@ -213,4 +213,6 @@ public final class SackConstant {
 	public static final int OUTLINE_SORT_POLICY_OFFSET = 2;
 
 	public static final int RULE_CONTEXT_DEPTH_TLD = 3;
+
+	public static final String PREFERENCE_LOG_LEVEL = "kitt.loglevel";
 }

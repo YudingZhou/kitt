@@ -25,15 +25,15 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.rules.IWordDetector;
 import org.quantumlabs.kitt.Activator;
-import org.quantumlabs.kitt.core.config.KITTParameter;
 import org.quantumlabs.kitt.core.util.Helper;
 import org.quantumlabs.kitt.core.util.trace.Logger;
 import org.quantumlabs.kitt.ui.text.TTCNCodeScanner;
 import org.quantumlabs.kitt.ui.text.UnionDetecor;
+import org.quantumlabs.kitt.ui.util.exception.StackTracableException;
 
 public class LineBasedDocumentIndex implements IDocumentIndex {
 
-	private final HashMap<String, Word> index;
+	private HashMap<String, Word> index;
 	private ArrayList<Line> lines;
 	private IDocument doc;
 	public static IWordDetector WORD_DETECTOR = new UnionDetecor();
@@ -61,7 +61,6 @@ public class LineBasedDocumentIndex implements IDocumentIndex {
 	}
 
 	class InternalDriver implements IDocumentListener {
-		TTCNCodeScanner scanner;
 		DocumentRewriteSession rewrite;
 
 		void startRewrite(DocumentRewriteSession session) {
@@ -448,16 +447,43 @@ public class LineBasedDocumentIndex implements IDocumentIndex {
 		return element instanceof String && !Helper.isWhitespace(element.toString());
 	}
 
+	/**
+	 * @contract 1. It's ok to fail for reIndex.<br>
+	 *           2. If reIndex fails, KITT tries to install a new DocumentIndex
+	 *           to current document.<br>
+	 *           3. If error remains after new DocumentIndex installed. No more
+	 *           action but shows error in GUI. (Close and reopen editor should
+	 *           revert.)
+	 * */
 	private void reIndex() {
 		try {
-			String content = doc.get(0, doc.getLength());
+			index.clear();
+			lines.clear();
+			refresh();
+		} catch (StackTracableException e) {
+			if (Logger.isErrorEnable()) {
+				Logger.logError(toString(), e, "Document index reIndex failed due to Wrapped-BadLocationException!");
+			}
+			TTCNCore.instance().installDocumentIndex(doc);
+			// I have to show the exception if installing of new DocumentIndex fails.
+			// There might be better idea.
+			((LineBasedDocumentIndex) TTCNCore.instance().getDocumentIndex(doc)).refresh();
+		} catch (Exception e) {
+			if (Logger.isErrorEnable()) {
+				Logger.logError(toString(), e, String.format(
+						"Very bad! Document index reIndex failed due to %s! Install new LineBasedDocumentIndex", e));
+			}
+		}
+	}
+
+	private void refresh() {
+		String content = null;
+		try {
+			content = doc.get(0, doc.getLength());
 			DocumentEvent event = new DocumentEvent(doc, 0, doc.getLength(), content);
 			driver.documentChanged(event);
 		} catch (BadLocationException e) {
-			if (Logger.isErrorEnable()) {
-				Logger.logError(toString(), e,
-						"Document index reIndex failed! I can't handle it anymore, ignore the exception.");
-			}
+			throw new StackTracableException(e);
 		}
 	}
 }

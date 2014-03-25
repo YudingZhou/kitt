@@ -658,7 +658,13 @@ public class TTCNCore {
 
 	public IDocumentIndex getDocumentIndex(IDocument infokey) {
 		Info info = retrieveInfo(infokey);
-		return info.tIndex == null ? info.tIndex = new LineBasedDocumentIndex() : info.tIndex;
+		return info.tIndex;
+	}
+	
+	public void installDocumentIndex(IDocument infoKey){
+		Info info = retrieveInfo(infoKey);
+		info.tIndex = new LineBasedDocumentIndex();
+		info.tIndex.install(infoKey);
 	}
 
 	private Map<IDocument, IFile> association = new HashMap<IDocument, IFile>();

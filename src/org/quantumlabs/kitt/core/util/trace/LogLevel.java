@@ -2,7 +2,7 @@ package org.quantumlabs.kitt.core.util.trace;
 
 public enum LogLevel
 {
-    SYSTEM( 5 ), TRACE( 4 ), DEBUG( 3 ), WARNING( 2 ), ERROR( 1 );
+    SYSTEM( 5 ), TRACE( 4 ), DEBUG( 3 ), WARNING( 2 ), ERROR( 1 ), NONE ( 0 );
 
     private LogLevel(int id)
     {

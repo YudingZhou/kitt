@@ -31,7 +31,6 @@ public class Logger
 
     public static void initialize()
     {
-
         int level = KITTParameter.getLogLevel();
         if( level == LogLevel.ERROR.id() )
         {
@@ -55,14 +54,11 @@ public class Logger
         }
         else
         {
-            if( KITTParameter.isBETA() )
-            {
-                BasicSemanticValidator.fail( "unknown log level " + level );
-            }
+            Logger.setLevel(LogLevel.NONE);
         }
     }
 
-    private static void setLevel( LogLevel level )
+    public static void setLevel( LogLevel level )
     {
         switch( level )
         {
@@ -78,7 +74,7 @@ public class Logger
                 errorEnable = true;
                 break;
             default:
-                BasicSemanticValidator.fail( "unknown log level : " + level );
+            	systemEnable = traceEnable = debugEnable = waringEnable = errorEnable = false;
         }
     }
 

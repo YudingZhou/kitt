@@ -55,22 +55,12 @@ public class Activator extends AbstractUIPlugin {
 	private final ColorManager colorManager;
 	private final IPreferenceStore kPreferenceStore;
 
-	/**
-	 * The constructor
-	 */
 	public Activator() {
 		configurationManager = new ConfigurationManager();
 		kPreferenceStore = getPreferenceStore();
 		colorManager = ColorManager.instance();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
-	 * )
-	 */
+	
 	@Override
 	public void start(BundleContext context ) throws Exception {
 		super.start(context);
@@ -81,7 +71,6 @@ public class Activator extends AbstractUIPlugin {
 		ResourcesManager.instance().initialize();
 		TransactionCache.instance().initialize();
 		initializePreferences();
-		// initializeProjects();
 	}
 
 	private void initializeProjects() {
@@ -116,6 +105,13 @@ public class Activator extends AbstractUIPlugin {
 		preferenceStore.putValue(Helper.generatePresentLayerKey(SackConstant.ANNOTATION_TYPE_OCCURRENCE), "1");
 		preferenceStore
 				.putValue(Helper.generateAnnotationHighlightKey(SackConstant.ANNOTATION_TYPE_OCCURRENCE), "true");
+		KITTParameter.initialize(kPreferenceStore);
+		Logger.initialize();
+		try {
+			Logger.setLogger(ILogger.DEFAULT_LOGGER);
+		} catch (Exception e) {
+			//ignore.
+		}
 	}
 
 	/**
@@ -123,23 +119,6 @@ public class Activator extends AbstractUIPlugin {
 	 * configurations.
 	 * */
 	private void preStart() {
-		configurationManager.setLogLevel(5);
-		configurationManager.setBeta(true);
-		Logger.initialize();
-		try {
-			Handler handler = new FileHandler("c:\\kitt.log");
-			final java.util.logging.Logger logger = java.util.logging.Logger.getGlobal();
-			logger.addHandler(handler);
-			Logger.setLogger(new ILogger() {
-				@Override
-				public void log(String message) {
-					logger.log(Level.ALL, message);
-				}
-			});
-		} catch (Exception e) {
-			getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, "Initialize logger failed."));
-		}
-
 		KITTParameter.setTTCNKeyWordDefaultColor(Theme.JAVA_LIKE.keyWord);
 		KITTParameter.setTTCNBracketDefaultColor(Theme.JAVA_LIKE.brace);
 		KITTParameter.setTTCNOperatorDefaultColor(Theme.JAVA_LIKE.operator);
@@ -149,14 +128,7 @@ public class Activator extends AbstractUIPlugin {
 		KITTParameter.setAnnotationOccurrenceColorKey(Theme.JAVA_LIKE.overallAnnotation);
 		KITTParameter.setOutlineSortPolicy(SackConstant.OUTLINE_SORT_POLICY_OFFSET);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
-	 * )
-	 */
+	
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		kitt = null;
@@ -183,8 +155,6 @@ public class Activator extends AbstractUIPlugin {
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
-
-		// return imageDescriptorFromPlugin( PLUGIN_ID, path );
 		return ImageHolder.instance().checkoutDescriptor(path);
 	}
 
@@ -219,5 +189,4 @@ public class Activator extends AbstractUIPlugin {
 		}
 		return textTools;
 	}
-
 }

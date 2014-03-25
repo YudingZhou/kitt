@@ -21,5 +21,6 @@ Require-Bundle: org.eclipse.e4.ui.workbench;bundle-version="1.0.1",
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/antlr-4.2-complete.jar,
- .
+ .,
+ swing2swt.jar
 Bundle-Vendor: org.quantumlabs

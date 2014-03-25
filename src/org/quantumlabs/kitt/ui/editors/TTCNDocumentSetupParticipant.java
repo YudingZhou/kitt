@@ -38,7 +38,7 @@ public class TTCNDocumentSetupParticipant implements IDocumentSetupParticipant {
     }
 
     private void setupIndex(IDocument document) {
-	TTCNCore.instance().getDocumentIndex(document).install(document);
+	TTCNCore.instance().installDocumentIndex(document);
     }
 
     private FastPartitioner createDocumentPartitioner() {
